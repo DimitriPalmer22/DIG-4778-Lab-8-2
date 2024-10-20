@@ -84,7 +84,7 @@ public class EnemySpawner : MonoBehaviour
         _enemyBuilder
             .ResetEnemyInfo()
             .SetEnemySprite(enemySprites[0])
-            .SetEnemyColor(Color.green)
+            .SetEnemyColor(Color.magenta)
             .SetEnemyHealth(2)
             .SetEnemyDamage(1)
             .SetEnemyScore(3)

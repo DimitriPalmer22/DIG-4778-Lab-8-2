@@ -224,6 +224,7 @@ GameObject:
   m_Component:
   - component: {fileID: 920486238}
   - component: {fileID: 920486237}
+  - component: {fileID: 920486239}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -243,7 +244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a34cd1f36aed4a849d4ab306dd0a9786, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  test: 0
+  poolData: []
 --- !u!4 &920486238
 Transform:
   m_ObjectHideFlags: 0
@@ -259,6 +260,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &920486239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920486236}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d1a8005bd94b228c301e6ebd351bda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseEnemyPrefab: {fileID: 7664120105520023785, guid: 5b066f330ced5c4449b5a5773471afc0, type: 3}
+  enemySprites:
+  - {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  - {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  - {fileID: 3625043607559282579, guid: 19fb86013d8c24d6cb8410c0aadf30fa, type: 3}
+  - {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  - {fileID: 2747690628134850419, guid: b670ab75dde984907b8570040daa08c5, type: 3}
+  - {fileID: -2135585597343286014, guid: 4b2a04fdbe0ef4d8da8f90eaca817cd1, type: 3}
+  spawnTimer: 1
 --- !u!1001 &4385231065510158282
 PrefabInstance:
   m_ObjectHideFlags: 0

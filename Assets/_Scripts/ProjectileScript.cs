@@ -52,6 +52,22 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
         transform.position += transform.up * (speed * Time.deltaTime);
     }
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        // Debug.Log($"Entering Trigger: {other.name}");
+
+        // Try to get the enemy component
+        if (!other.TryGetComponent<Enemy>(out var enemy))
+            return;
+
+        Debug.Log($"Enemy Hit: {enemy.name}");
+
+        enemy.ChangeHealth(-1);
+
+        // Return the projectile to the pool
+        ProjectilePool.Instance.ReleaseGameObject(gameObject);
+    }
+
     #region Pooling Functions
 
     public void OnPoolGet()

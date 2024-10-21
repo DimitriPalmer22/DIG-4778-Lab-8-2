@@ -743,7 +743,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 43eabefa83e28154894ea27f0b4aacf1, type: 3}
   - {fileID: 21300000, guid: a3f6de2bcc130f74ea96ade71ae7a4cf, type: 3}
   - {fileID: 21300000, guid: 0a934c57d6c227f40a96b070f8fdcd24, type: 3}
-  spawnTimer: 3
+  spawnTimer: 1.8
 --- !u!114 &920486240
 MonoBehaviour:
   m_ObjectHideFlags: 0

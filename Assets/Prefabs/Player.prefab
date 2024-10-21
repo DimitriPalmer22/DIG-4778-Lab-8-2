@@ -201,4 +201,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 8014530536930203580, guid: c349d5babd4900c4ea9e9c3cacb71c86, type: 3}
-  bulletsPerSecond: 5
+  bulletsPerSecond: 4

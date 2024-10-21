@@ -8,12 +8,27 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
 
     [SerializeField] [Min(0)] private float speed = 5;
 
+    [SerializeField] private float degreesPerSecond = 360;
+
     private float _currentLifetime;
+
+    private int _rotationDirection = 1;
+
+    private Vector3 _direction;
+
+    private void Awake()
+    {
+        // Randomize the rotation direction
+        _rotationDirection = UnityEngine.Random.Range(0, 2) == 0 ? -1 : 1;
+    }
 
     public void Fire(GameObject shooter, Vector2 direction)
     {
         // Set the position to the shooter's position
         transform.position = shooter.transform.position;
+
+        // Set the direction
+        _direction = direction;
 
         // Set the rotation to the shooter's rotation
         transform.up = direction;
@@ -26,6 +41,9 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
     {
         // Update the movement
         UpdateMovement();
+
+        // Update the rotation
+        UpdateRotation();
 
         // Update the lifetime
         UpdateLifetime();
@@ -49,7 +67,13 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
     private void UpdateMovement()
     {
         // Move the projectile forward
-        transform.position += transform.up * (speed * Time.deltaTime);
+        transform.position += _direction * (speed * Time.deltaTime);
+    }
+
+    private void UpdateRotation()
+    {
+        // Rotate the projectile
+        transform.Rotate(Vector3.forward, degreesPerSecond * _rotationDirection * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

@@ -9,6 +9,9 @@ public class EnemySpawner : MonoBehaviour
 
     [SerializeField] public float spawnTimer = 3f;
 
+    [SerializeField] private Vector3 minSpawnZone;
+    [SerializeField] private Vector3 maxSpawnZone;
+
     private float _currentSpawnTimer;
 
     private EnemyBuilder _enemyBuilder;
@@ -37,9 +40,10 @@ public class EnemySpawner : MonoBehaviour
         const float precisionMod = 10000;
 
         // Get a random position from -4 to 4 on the x and y axes
-        var randomPosition = new Vector2(
-            UnityEngine.Random.Range(-4 * precisionMod, 4 * precisionMod) / precisionMod,
-            UnityEngine.Random.Range(-4 * precisionMod, 4 * precisionMod) / precisionMod
+        var randomPosition = new Vector3(
+            UnityEngine.Random.Range(minSpawnZone.x * precisionMod, maxSpawnZone.x * precisionMod) / precisionMod,
+            UnityEngine.Random.Range(minSpawnZone.y * precisionMod, maxSpawnZone.y * precisionMod) / precisionMod,
+            0
         );
 
         // Generate a random number from 1 to 4
@@ -98,7 +102,7 @@ public class EnemySpawner : MonoBehaviour
     {
         _enemyBuilder
             .ResetEnemyInfo()
-            .SetEnemySprite(enemySprites[0])
+            .SetEnemySprite(enemySprites[1])
             .SetEnemyColor(Color.blue)
             .SetEnemyHealth(1)
             .SetEnemyDamage(2)
@@ -113,7 +117,7 @@ public class EnemySpawner : MonoBehaviour
     {
         _enemyBuilder
             .ResetEnemyInfo()
-            .SetEnemySprite(enemySprites[0])
+            .SetEnemySprite(enemySprites[2])
             .SetEnemyColor(Color.red)
             .SetEnemyHealth(1)
             .SetEnemyDamage(1)
@@ -123,7 +127,6 @@ public class EnemySpawner : MonoBehaviour
         // Return the enemy info
         return _enemyBuilder.CurrentEnemyBuildInfo;
     }
-
 
     public Enemy SpawnEnemy(EnemyBuildInfo enemyInfo, Vector2 position)
     {
@@ -137,5 +140,27 @@ public class EnemySpawner : MonoBehaviour
         enemy.transform.rotation = Quaternion.identity;
 
         return enemy;
+    }
+
+    private void OnDrawGizmos()
+    {
+        var modMinSpawnZone = new Vector3(
+            minSpawnZone.x,
+            minSpawnZone.y,
+            -1
+        );
+
+        var modMaxSpawnZone = new Vector3(
+            maxSpawnZone.x,
+            maxSpawnZone.y,
+            1
+        );
+
+        var center = (modMinSpawnZone + modMaxSpawnZone) / 2;
+        var size = modMaxSpawnZone - modMinSpawnZone;
+
+        // Draw the spawn zone
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(center, size);
     }
 }

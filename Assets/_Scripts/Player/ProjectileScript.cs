@@ -60,8 +60,6 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
         if (!other.TryGetComponent<Enemy>(out var enemy))
             return;
 
-        Debug.Log($"Enemy Hit: {enemy.name}");
-
         enemy.ChangeHealth(-1);
 
         // Return the projectile to the pool

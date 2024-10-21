@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -16,9 +17,14 @@ public class PlayerMovement : MonoBehaviour
     // Reference to the player weapon
     private PlayerWeapon _playerWeapon;
 
+    private Player _player;
+
     // on awake
     private void Awake()
     {
+        // Get the player
+        _player = GetComponent<Player>();
+
         // get the player controller
         _playerController = new PlayerController();
 
@@ -39,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
         _playerController.Gameplay.Movement.canceled += _ => _movementInput = Vector2.zero;
 
         // subscribe to the shoot event
-        _playerController.Gameplay.Shoot.performed += _ => _playerWeapon.SetShooting(true);
+        _playerController.Gameplay.Shoot.performed += OnShoot;
 
         // cancel the shoot event
         _playerController.Gameplay.Shoot.canceled += _ => _playerWeapon.SetShooting(false);
@@ -57,11 +63,24 @@ public class PlayerMovement : MonoBehaviour
     // movement for top-down view using new input system
     private void OnMove(InputAction.CallbackContext value)
     {
+        // Return if the player is dead
+        if (_player.CurrentHealth <= 0)
+            return;
+
         _movementInput = value.ReadValue<Vector2>();
     }
 
     private void OnShoot(InputAction.CallbackContext value)
     {
+        // Return if the player is dead
+        if (_player.CurrentHealth <= 0)
+        {
+            // Reload the scene
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            return;
+        }
+
+        _playerWeapon.SetShooting(true);
     }
 
     // Move the player

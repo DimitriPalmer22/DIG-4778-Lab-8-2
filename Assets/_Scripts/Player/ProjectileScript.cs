@@ -84,7 +84,7 @@ public class ProjectileScript : MonoBehaviour, IObjectPooled
         if (!other.TryGetComponent<Enemy>(out var enemy))
             return;
 
-        enemy.ChangeHealth(-1);
+        enemy.TakeDamage(1);
 
         // Return the projectile to the pool
         ProjectilePool.Instance.ReleaseGameObject(gameObject);

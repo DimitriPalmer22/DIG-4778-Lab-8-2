@@ -17,12 +17,13 @@ public class ScoreManager : MonoBehaviour
     {
         // Find the player object
         _player = FindObjectOfType<Player>();
+
+        // Set the instance to this
+        Instance = this;
     }
 
     private void Start()
     {
-        Instance = this;
-
         // Disable the game over text
         SetGameOverText(false);
 

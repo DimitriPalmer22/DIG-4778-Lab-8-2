@@ -114,6 +114,54 @@ public partial class @PlayerController: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""SaveLoad"",
+            ""id"": ""2ec3ef23-7330-4116-9afb-d2baa041658a"",
+            ""actions"": [
+                {
+                    ""name"": ""Save"",
+                    ""type"": ""Button"",
+                    ""id"": ""71adfd5d-f126-476b-8692-5b46614b1930"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Load"",
+                    ""type"": ""Button"",
+                    ""id"": ""10645059-735c-4f79-aee5-64d296bf018e"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""64a63f1a-3f56-4e6c-a7e9-63b5b1648a28"",
+                    ""path"": ""<Keyboard>/s"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Save"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c115a0de-8042-4354-8cff-f6d4473fddc9"",
+                    ""path"": ""<Keyboard>/l"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Load"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -122,6 +170,10 @@ public partial class @PlayerController: IInputActionCollection2, IDisposable
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_Movement = m_Gameplay.FindAction("Movement", throwIfNotFound: true);
         m_Gameplay_Shoot = m_Gameplay.FindAction("Shoot", throwIfNotFound: true);
+        // SaveLoad
+        m_SaveLoad = asset.FindActionMap("SaveLoad", throwIfNotFound: true);
+        m_SaveLoad_Save = m_SaveLoad.FindAction("Save", throwIfNotFound: true);
+        m_SaveLoad_Load = m_SaveLoad.FindAction("Load", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -233,9 +285,68 @@ public partial class @PlayerController: IInputActionCollection2, IDisposable
         }
     }
     public GameplayActions @Gameplay => new GameplayActions(this);
+
+    // SaveLoad
+    private readonly InputActionMap m_SaveLoad;
+    private List<ISaveLoadActions> m_SaveLoadActionsCallbackInterfaces = new List<ISaveLoadActions>();
+    private readonly InputAction m_SaveLoad_Save;
+    private readonly InputAction m_SaveLoad_Load;
+    public struct SaveLoadActions
+    {
+        private @PlayerController m_Wrapper;
+        public SaveLoadActions(@PlayerController wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Save => m_Wrapper.m_SaveLoad_Save;
+        public InputAction @Load => m_Wrapper.m_SaveLoad_Load;
+        public InputActionMap Get() { return m_Wrapper.m_SaveLoad; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(SaveLoadActions set) { return set.Get(); }
+        public void AddCallbacks(ISaveLoadActions instance)
+        {
+            if (instance == null || m_Wrapper.m_SaveLoadActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_SaveLoadActionsCallbackInterfaces.Add(instance);
+            @Save.started += instance.OnSave;
+            @Save.performed += instance.OnSave;
+            @Save.canceled += instance.OnSave;
+            @Load.started += instance.OnLoad;
+            @Load.performed += instance.OnLoad;
+            @Load.canceled += instance.OnLoad;
+        }
+
+        private void UnregisterCallbacks(ISaveLoadActions instance)
+        {
+            @Save.started -= instance.OnSave;
+            @Save.performed -= instance.OnSave;
+            @Save.canceled -= instance.OnSave;
+            @Load.started -= instance.OnLoad;
+            @Load.performed -= instance.OnLoad;
+            @Load.canceled -= instance.OnLoad;
+        }
+
+        public void RemoveCallbacks(ISaveLoadActions instance)
+        {
+            if (m_Wrapper.m_SaveLoadActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ISaveLoadActions instance)
+        {
+            foreach (var item in m_Wrapper.m_SaveLoadActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_SaveLoadActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public SaveLoadActions @SaveLoad => new SaveLoadActions(this);
     public interface IGameplayActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnShoot(InputAction.CallbackContext context);
+    }
+    public interface ISaveLoadActions
+    {
+        void OnSave(InputAction.CallbackContext context);
+        void OnLoad(InputAction.CallbackContext context);
     }
 }

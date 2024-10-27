@@ -89,7 +89,7 @@ public class EnemyBuilder
         spriteRenderer.color = enemyInfo.Color;
 
         // Set the enemy's health
-        enemyScript.health = enemyInfo.Health;
+        enemyScript.SetHealth(enemyInfo.Health, enemyInfo.Health);
 
         // Set the enemy's damage
         enemyScript.damage = enemyInfo.Damage;

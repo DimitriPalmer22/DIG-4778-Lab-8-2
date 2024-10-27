@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class Enemy : Actor
@@ -50,8 +51,23 @@ public class Enemy : Actor
         Destroy(gameObject);
     }
 
-    protected override void CustomLoad(string path)
+    protected override void CustomLoad(ActorData data)
     {
+        var enemyData = (EnemyData)data;
+
+        damage = enemyData.Damage;
+        score = enemyData.Score;
+        speed = enemyData.Speed;
+
+        var spriteRenderer = GetComponent<SpriteRenderer>();
+
+        spriteRenderer.color = enemyData.Color;
+
+        var spriteIndex = enemyData.SpriteIndex;
+        spriteRenderer.sprite =
+            EnemySpawner.Instance.EnemySprites.ToArray()[spriteIndex];
+
+        GetComponent<EnemyMovement>().speed = enemyData.MoveDirection;
     }
 }
 
@@ -62,6 +78,19 @@ public class EnemyData : ActorData
     [SerializeField] private float score;
     [SerializeField] private float speed;
     [SerializeField] private Color color;
+    [SerializeField] private int spriteIndex;
+    [SerializeField] private float moveDirection;
+
+    #region Getters
+
+    public float Damage => damage;
+    public float Score => score;
+    public float Speed => speed;
+    public Color Color => color;
+    public int SpriteIndex => spriteIndex;
+    public float MoveDirection => moveDirection;
+
+    #endregion
 
     public EnemyData(Enemy enemy) : base(enemy)
     {
@@ -69,6 +98,11 @@ public class EnemyData : ActorData
         score = enemy.score;
         speed = enemy.speed;
 
-        color = enemy.GetComponent<SpriteRenderer>().color;
+        var spriteRenderer = enemy.GetComponent<SpriteRenderer>();
+
+        color = spriteRenderer.color;
+        spriteIndex = EnemySpawner.Instance.GetSpriteIndex(spriteRenderer.sprite);
+
+        moveDirection = enemy.GetComponent<EnemyMovement>().speed;
     }
 }

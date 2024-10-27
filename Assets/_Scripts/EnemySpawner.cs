@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [SerializeField] public GameObject baseEnemyPrefab;
+    public static EnemySpawner Instance { get; private set; }
 
-    [SerializeField] public Sprite[] enemySprites;
+    [SerializeField] private GameObject baseEnemyPrefab;
 
-    [SerializeField] public float spawnTimer = 3f;
+    [SerializeField] private Sprite[] enemySprites;
+
+    [SerializeField] private float spawnTimer = 3f;
 
     [SerializeField] private Vector3 minSpawnZone;
     [SerializeField] private Vector3 maxSpawnZone;
@@ -16,8 +19,21 @@ public class EnemySpawner : MonoBehaviour
 
     private EnemyBuilder _enemyBuilder;
 
+    private List<Enemy> _enemies = new();
+
+    #region Getters
+
+    public GameObject BaseEnemyPrefab => baseEnemyPrefab;
+
+    public IReadOnlyCollection<Sprite> EnemySprites => enemySprites;
+
+    #endregion
+
     private void Awake()
     {
+        // Set the instance
+        Instance = this;
+
         _enemyBuilder = new EnemyBuilder(this);
         _currentSpawnTimer = spawnTimer;
     }
@@ -68,6 +84,8 @@ public class EnemySpawner : MonoBehaviour
     {
         _currentSpawnTimer -= Time.deltaTime;
     }
+
+    #region Build Methods
 
     public EnemyBuildInfo BuildRandomEnemy()
     {
@@ -128,6 +146,8 @@ public class EnemySpawner : MonoBehaviour
         return _enemyBuilder.CurrentEnemyBuildInfo;
     }
 
+    #endregion
+
     public Enemy SpawnEnemy(EnemyBuildInfo enemyInfo, Vector2 position)
     {
         // Build the enemy
@@ -139,7 +159,69 @@ public class EnemySpawner : MonoBehaviour
         // Set the enemy's rotation
         enemy.transform.rotation = Quaternion.identity;
 
+        enemy.OnHit += RemoveOnDeath;
+
+        // Add the enemy to the list
+        _enemies.Add(enemy);
+
         return enemy;
+    }
+
+    public Enemy SpawnEnemyUsingData(EnemyData data)
+    {
+        _enemyBuilder
+            .ResetEnemyInfo()
+            .SetEnemyHealth(data.MaxHealth)
+            .SetEnemyDamage(data.Damage)
+            .SetEnemyScore(data.Score)
+            .SetEnemySpeed(data.Speed)
+            .SetEnemyColor(data.Color);
+
+        // Build the enemy
+        var enemy = SpawnEnemy(_enemyBuilder.CurrentEnemyBuildInfo, data.Transform.Position);
+
+        // Call the load function
+        enemy.Load(data);
+
+        // Add the enemy to the list
+        _enemies.Add(enemy);
+
+        return enemy;
+    }
+
+    private void RemoveOnDeath(Actor obj)
+    {
+        if (obj is not Enemy enemy)
+            return;
+
+        // Check the enemy's health
+        if (enemy.CurrentHealth > 0)
+            return;
+
+        // Remove the enemy from the list
+        _enemies.Remove(enemy);
+    }
+
+    public void RemoveAllEnemies()
+    {
+        while (_enemies.Count > 0)
+        {
+            var enemy = _enemies[0];
+
+            // Remove the enemy from the list
+            _enemies.Remove(enemy);
+
+            // Destroy the enemy
+            Destroy(enemy.gameObject);
+        }
+
+        // Clear the list
+        _enemies.Clear();
+    }
+
+    public int GetSpriteIndex(Sprite sprite)
+    {
+        return Array.IndexOf(enemySprites, sprite);
     }
 
     private void OnDrawGizmos()

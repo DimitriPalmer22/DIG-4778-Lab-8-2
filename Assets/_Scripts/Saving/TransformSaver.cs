@@ -12,6 +12,16 @@ public class TransformSaver
     [SerializeField] private Quaternion rotation;
     [SerializeField] private Vector3 scale;
 
+    #region Getters
+
+    public Vector3 Position => position;
+
+    public Quaternion Rotation => rotation;
+
+    public Vector3 Scale => scale;
+
+    #endregion
+
     public TransformSaver(Transform transform)
     {
         _transform = transform;

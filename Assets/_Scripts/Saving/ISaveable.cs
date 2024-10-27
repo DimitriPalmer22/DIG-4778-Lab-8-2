@@ -5,5 +5,5 @@ public interface ISaveable
 {
     string SaveID { get; }
 
-    public void Load(string path);
+    public void Load(ISaveDataToken token);
 }

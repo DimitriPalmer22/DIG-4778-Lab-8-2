@@ -20,9 +20,12 @@ public class Player : Actor
         ScoreManager.Instance.SetGameOverText(true);
     }
 
-    protected override void CustomLoad(string path)
+    protected override void CustomLoad(ActorData data)
     {
+        // Update the score text
+        ScoreManager.Instance.UpdateText();
     }
+
 }
 
 [Serializable]

@@ -74,7 +74,7 @@ public class EnemyBuilder
     public Enemy InstantiateEnemy(EnemyBuildInfo enemyInfo)
     {
         // Instantiate the enemy prefab
-        var enemy = Object.Instantiate(_enemySpawner.baseEnemyPrefab);
+        var enemy = Object.Instantiate(_enemySpawner.BaseEnemyPrefab);
 
         // Get the enemy's script
         var enemyScript = enemy.GetComponent<Enemy>();

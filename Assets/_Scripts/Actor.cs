@@ -86,21 +86,41 @@ public abstract class Actor : MonoBehaviour, ISaveable
 
     #endregion
 
-    public void Load(string path)
+    public void Load(ISaveDataToken token)
     {
-        CustomLoad(path);
+        var data = token as ActorData;
+
+        // Copy the transform data
+        transform.position = data.Transform.Position;
+        transform.rotation = data.Transform.Rotation;
+        transform.localScale = data.Transform.Scale;
+
+        // Set the health
+        SetHealth(data.CurrentHealth, data.MaxHealth);
+
+        CustomLoad(data);
     }
 
-    protected abstract void CustomLoad(string path);
+    protected abstract void CustomLoad(ActorData data);
 }
 
 [Serializable]
-public abstract class ActorData
+public abstract class ActorData : ISaveDataToken
 {
     [SerializeField] private TransformSaver transform;
 
     [SerializeField] private float currentHealth;
     [SerializeField] private float maxHealth;
+
+    #region Getters
+
+    public TransformSaver Transform => transform;
+
+    public float CurrentHealth => currentHealth;
+
+    public float MaxHealth => maxHealth;
+
+    #endregion
 
     public ActorData(Actor actor)
     {

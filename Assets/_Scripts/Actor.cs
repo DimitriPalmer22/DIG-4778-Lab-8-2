@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-public abstract class Actor : MonoBehaviour
+public abstract class Actor : MonoBehaviour, ISaveable
 {
+    public string SaveID => $"{gameObject.GetInstanceID()}";
+
     [SerializeField] [Min(0)] private float maxHealth = 5;
     [SerializeField] [Min(0)] private float currentHealth;
 
     public event Action<Actor> OnHit;
 
     #region Getters
+
+    public abstract ActorData ActorData { get; }
 
     public float CurrentHealth => currentHealth;
 
@@ -36,6 +42,8 @@ public abstract class Actor : MonoBehaviour
     protected virtual void CustomStart()
     {
     }
+
+    #region Health Management
 
     private void ChangeHealth(float amount)
     {
@@ -75,4 +83,29 @@ public abstract class Actor : MonoBehaviour
     }
 
     protected abstract void Die();
+
+    #endregion
+
+    public void Load(string path)
+    {
+        CustomLoad(path);
+    }
+
+    protected abstract void CustomLoad(string path);
+}
+
+[Serializable]
+public abstract class ActorData
+{
+    [SerializeField] private TransformSaver transform;
+
+    [SerializeField] private float currentHealth;
+    [SerializeField] private float maxHealth;
+
+    public ActorData(Actor actor)
+    {
+        transform = (TransformSaver)actor.transform;
+        currentHealth = actor.CurrentHealth;
+        maxHealth = actor.MaxHealth;
+    }
 }

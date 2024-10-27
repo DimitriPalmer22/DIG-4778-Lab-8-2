@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
 
 public class Enemy : Actor
@@ -13,6 +14,11 @@ public class Enemy : Actor
 
     #endregion
 
+    public override ActorData ActorData => new EnemyData(this);
+
+    protected override void CustomAwake()
+    {
+    }
 
     protected override void CustomStart()
     {
@@ -42,5 +48,27 @@ public class Enemy : Actor
 
         // Destroy the enemy
         Destroy(gameObject);
+    }
+
+    protected override void CustomLoad(string path)
+    {
+    }
+}
+
+[Serializable]
+public class EnemyData : ActorData
+{
+    [SerializeField] private float damage;
+    [SerializeField] private float score;
+    [SerializeField] private float speed;
+    [SerializeField] private Color color;
+
+    public EnemyData(Enemy enemy) : base(enemy)
+    {
+        damage = enemy.damage;
+        score = enemy.score;
+        speed = enemy.speed;
+
+        color = enemy.GetComponent<SpriteRenderer>().color;
     }
 }

@@ -19,8 +19,16 @@ public class PlayerMovement : MonoBehaviour
 
     private Player _player;
 
+    private Rigidbody2D _rigidbody;
+
     // on awake
     private void Awake()
+    {
+        // Initialize the components
+        InitializeComponents();
+    }
+
+    private void InitializeComponents()
     {
         // Get the player
         _player = GetComponent<Player>();
@@ -30,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
 
         // get the player weapon
         _playerWeapon = GetComponent<PlayerWeapon>();
+
+        // Get the rigidbody component
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
     // OnEnable is called when the script is enabled
@@ -39,10 +50,10 @@ public class PlayerMovement : MonoBehaviour
         _playerController.Gameplay.Enable();
 
         // subscribe to the move event
-        _playerController.Gameplay.Movement.performed += OnMove;
+        _playerController.Gameplay.Movement.performed += OnMovePerformed;
 
         // cancel the move event
-        _playerController.Gameplay.Movement.canceled += _ => _movementInput = Vector2.zero;
+        _playerController.Gameplay.Movement.canceled += OnMoveCancelled;
 
         // subscribe to the shoot event
         _playerController.Gameplay.Shoot.performed += OnShoot;
@@ -51,23 +62,31 @@ public class PlayerMovement : MonoBehaviour
         _playerController.Gameplay.Shoot.canceled += _ => _playerWeapon.SetShooting(false);
     }
 
+
     private void OnDisable()
     {
         // disable the input action
         _playerController.Gameplay.Disable();
 
         // unsubscribe to the move event
-        _playerController.Gameplay.Movement.performed -= OnMove;
+        _playerController.Gameplay.Movement.performed -= OnMovePerformed;
     }
 
+    #region Input Functions
+
     // movement for top-down view using new input system
-    private void OnMove(InputAction.CallbackContext value)
+    private void OnMovePerformed(InputAction.CallbackContext value)
     {
         // Return if the player is dead
         if (_player.CurrentHealth <= 0)
             return;
 
         _movementInput = value.ReadValue<Vector2>();
+    }
+
+    private void OnMoveCancelled(InputAction.CallbackContext obj)
+    {
+        _movementInput = Vector2.zero;
     }
 
     private void OnShoot(InputAction.CallbackContext value)
@@ -83,11 +102,18 @@ public class PlayerMovement : MonoBehaviour
         _playerWeapon.SetShooting(true);
     }
 
+    #endregion
+
+
     // Move the player
     private void MovePlayer()
     {
-        Vector3 movement = new Vector3(_movementInput.x, _movementInput.y, 0) * (speed * Time.deltaTime);
-        transform.position += movement;
+        // Reset the movement input to 0 if the player is dead
+        if (_player.CurrentHealth <= 0)
+            _movementInput = Vector2.zero;
+
+        var movement = new Vector2(_movementInput.x, _movementInput.y) * (speed);
+        _rigidbody.velocity = movement;
     }
 
     // fixed update is called every fixed frame

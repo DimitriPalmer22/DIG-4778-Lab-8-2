@@ -51,4 +51,19 @@ public class Enemy : MonoBehaviour
         if (enemy.health <= 0)
             Destroy(enemy.gameObject);
     }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Debug.Log($"Collision with {other.gameObject.name}");
+
+        // Try to get the enemy component
+        if (!other.gameObject.TryGetComponent<Player>(out var player))
+            return;
+
+        // Change the player's health by the enemy's damage
+        player.ChangeHealth(-damage);
+
+        // Destroy the enemy
+        Destroy(gameObject);
+    }
 }

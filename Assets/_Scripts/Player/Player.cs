@@ -40,16 +40,21 @@ public class Player : MonoBehaviour
         ScoreManager.Instance.SetGameOverText(true);
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
+    // private void OnTriggerEnter2D(Collider2D other)
+    // {
+    //     // Try to get the enemy component
+    //     if (!other.TryGetComponent<Enemy>(out var enemy))
+    //         return;
+    //
+    //     // Change the player's health by the enemy's damage
+    //     ChangeHealth(-enemy.damage);
+    //
+    //     // Destroy the enemy
+    //     Destroy(enemy.gameObject);
+    // }
+
+    private void OnCollisionEnter2D(Collision2D other)
     {
-        // Try to get the enemy component
-        if (!other.TryGetComponent<Enemy>(out var enemy))
-            return;
 
-        // Change the player's health by the enemy's damage
-        ChangeHealth(-enemy.damage);
-
-        // Destroy the enemy
-        Destroy(enemy.gameObject);
     }
 }

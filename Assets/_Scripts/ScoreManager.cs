@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using TMPro;
 using UnityEngine;
 
@@ -12,6 +14,8 @@ public class ScoreManager : MonoBehaviour
     private Player _player;
 
     private float _score;
+
+    public float Score => _score;
 
     private void Awake()
     {
@@ -45,5 +49,13 @@ public class ScoreManager : MonoBehaviour
     public void SetGameOverText(bool active)
     {
         gameOverText.gameObject.SetActive(active);
+    }
+
+    public void Load(BinaryFormatter formatter, Stream data)
+    {
+        _score = (float)formatter.Deserialize(data);
+
+        // Update the text
+        UpdateText();
     }
 }

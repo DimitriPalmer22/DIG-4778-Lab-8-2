@@ -211,6 +211,10 @@ public class EnemySpawner : MonoBehaviour
             // Remove the enemy from the list
             _enemies.Remove(enemy);
 
+            // Continue if the enemy is marked for deletion
+            if (enemy == null)
+                continue;
+
             // Destroy the enemy
             Destroy(enemy.gameObject);
         }

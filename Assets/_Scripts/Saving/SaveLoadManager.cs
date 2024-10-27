@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Object = UnityEngine.Object;
@@ -11,7 +12,8 @@ public class SaveLoadManager : MonoBehaviour
 
     private PlayerController _playerController;
 
-    private string SavePath => $"C:/Users/Kesou/Desktop/tmpFolder/{LOCATION_DATA_FILE}";
+    private string LocationSavePath => $"{Application.persistentDataPath}/{LOCATION_DATA_FILE}";
+    private string ScoreSavePath => $"{Application.persistentDataPath}/{SCORE_DATA_FILE}";
 
     private void Awake()
     {
@@ -28,7 +30,7 @@ public class SaveLoadManager : MonoBehaviour
     private void OnSave(InputAction.CallbackContext obj)
     {
         // Get the save path
-        Debug.Log($"Saving to {SavePath}");
+        Debug.Log($"Saving to {LocationSavePath}");
 
         // Create a new GameSaver
         var gameSaver = new GameSaver(this);
@@ -37,13 +39,23 @@ public class SaveLoadManager : MonoBehaviour
         var data = JsonUtility.ToJson(gameSaver, true);
 
         // Save the data to the file
-        System.IO.File.WriteAllText(SavePath, data);
+        System.IO.File.WriteAllText(LocationSavePath, data);
+
+        // Create a binary formatter
+        var formatter = new BinaryFormatter();
+        var stream = new System.IO.FileStream(ScoreSavePath, System.IO.FileMode.Create);
+
+        // Serialize the data
+        formatter.Serialize(stream, ScoreManager.Instance.Score);
+
+        // Close the stream
+        stream.Close();
     }
 
     private void OnLoad(InputAction.CallbackContext obj)
     {
         // Open the file
-        var data = System.IO.File.ReadAllText(SavePath);
+        var data = System.IO.File.ReadAllText(LocationSavePath);
 
         // Use the JsonUtility to deserialize the data
         var gameSaver = JsonUtility.FromJson<GameSaver>(data);
@@ -58,10 +70,17 @@ public class SaveLoadManager : MonoBehaviour
         foreach (var enemyData in gameSaver.Enemies)
             EnemySpawner.Instance.SpawnEnemyUsingData(enemyData);
 
-        // Log the data
-        Debug.Log($"Player: {gameSaver.Player.Transform.Position} - {gameSaver.Player.CurrentHealth} - {gameSaver.Player.MaxHealth}");
-        foreach (var enemy in gameSaver.Enemies)
-            Debug.Log($"Enemy: {enemy.Transform.Position} - {enemy.CurrentHealth} - {enemy.MaxHealth}");
+        // Load the score
+        var formatter = new BinaryFormatter();
+
+        // Open the stream
+        var stream = new System.IO.FileStream(ScoreSavePath, System.IO.FileMode.Open);
+
+        // Deserialize the data
+        ScoreManager.Instance.Load(formatter, stream);
+
+        // Close the stream
+        stream.Close();
     }
 }
 
